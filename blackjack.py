@@ -2,6 +2,7 @@ import pygame as game
 import sys
 import time
 import random
+import math
 
 from pygame.constants import ACTIVEEVENT
 
@@ -194,6 +195,12 @@ class GamePlay:
 
     count_value = 1000
 
+    initial_time = pow(10,99)
+    inital_player_hand_time = pow(10,99)
+    inital_dealer_hand_time = pow(10,99)
+    time_flag = 0
+    initial_player_hand_time_flag = 0
+    initial_dealer_hand_time_flag = 0
 
     def pygame_init(self):
         game.init()
@@ -252,12 +259,13 @@ class GamePlay:
         dealer.dealer_card_generator()
         game_state.window_init()
         while running:
-            game.time.delay(1)
+            game.time.delay(2)
             #game_state.window_init()
             game_state.status_display()
             player.buttons()
             player.dealt_cards()
             dealer.dealer_cards()
+            #dealer.time_exp()
             #print(game.mouse.get_pos())
             for event in game.event.get():
 
@@ -371,6 +379,7 @@ class Player:
                         game.draw.rect(game_state.screen, (game_state.table_red),[stand_x_pos, stand_y_pos, stand_x_len, stand_y_len])
                         game_state.screen.blit(stand, (stand_x_pos + font_x_pos, split_y_pos + (0.3 * split_y_len)))
                         self.stand_flag += 1
+                        game_state.initial_time = time.time()
 
         # Double down button
         double_x_pos = stand_x_pos + 200
@@ -485,6 +494,8 @@ class Player:
 
                             if game_state.initial_balance < 0:
                                 game_state.initial_balance = 0
+                            
+                            game_state.inital_player_hand_time = time.time()
 
 
 
@@ -498,7 +509,7 @@ class Player:
 
         return (self.initial_card_x + (position * self.x_mov), self.initial_card_y - (position * self.y_mov))
 
-    card_value = 0
+    hand_value = 0
     player_hand_value = 0
 
     # Player money 
@@ -509,6 +520,7 @@ class Player:
     def card_display(self, card, suite):
 
         if card == 1:
+            
             if suite == 1:
                 return game_state.ace_s
             
@@ -522,6 +534,7 @@ class Player:
                 return game_state.ace_h
         
         if card == 2:
+
             if suite == 1:
                 return game_state.two_s
             
@@ -534,9 +547,10 @@ class Player:
             if suite == 4:
                 return game_state.two_h
 
-            self.card_value = 2
+            
 
         if card == 3:
+
             if suite == 1:
                 return game_state.three_s
             
@@ -549,9 +563,9 @@ class Player:
             if suite == 4:
                 return game_state.three_h
             
-            self.card_value = 3
-
+    
         if card == 4:
+
             if suite == 1:
                 return game_state.four_s
             
@@ -564,9 +578,10 @@ class Player:
             if suite == 4:
                 return game_state.four_h
             
-            self.card_value = 4
+            
         
         if card == 5:
+
             if suite == 1:
                 return game_state.five_s
             
@@ -579,9 +594,10 @@ class Player:
             if suite == 4:
                 return game_state.five_h
             
-            self.card_value = 5
+            
 
         if card == 6:
+
             if suite == 1:
                 return game_state.six_s
             
@@ -594,9 +610,9 @@ class Player:
             if suite == 4:
                 return game_state.six_h
             
-            self.card_value = 6
-        
+    
         if card == 7:
+
             if suite == 1:
                 return game_state.seven_s
             
@@ -609,9 +625,10 @@ class Player:
             if suite == 4:
                 return game_state.seven_h
             
-            self.card_value = 7
+            
         
         if card == 8:
+
             if suite == 1:
                 return game_state.eight_s
             
@@ -624,9 +641,10 @@ class Player:
             if suite == 4:
                 return game_state.eight_h
             
-            self.card_value = 8
+            
 
         if card == 9:
+
             if suite == 1:
                 return game_state.nine_s
             
@@ -639,9 +657,10 @@ class Player:
             if suite == 4:
                 return game_state.nine_h
             
-            self.card_value = 9
+            
 
         if card == 10:
+
             if suite == 1:
                 return game_state.ten_s
             
@@ -654,9 +673,10 @@ class Player:
             if suite == 4:
                 return game_state.ten_h
             
-            self.card_value = 10
+            
         
         if card == 11:
+
             if suite == 1:
                 return game_state.jack_s
             
@@ -669,9 +689,10 @@ class Player:
             if suite == 4:
                 return game_state.jack_h
             
-            self.card_value = 10
-
+            
         if card == 12:
+
+
             if suite == 1:
                 return game_state.queen_s
             
@@ -684,9 +705,9 @@ class Player:
             if suite == 4:
                 return game_state.queen_h
             
-            self.card_value = 10
         
         if card == 13:
+
             if suite == 1:
                 return game_state.king_s
             
@@ -698,8 +719,18 @@ class Player:
             
             if suite == 4:
                 return game_state.king_h
+        
             
-            self.card_value = 10
+    
+    def face_value(self, card):
+
+        if card >= 10 and card <= 13:
+            return 10
+        elif card == 1:
+            return 11
+        else: 
+            return card
+            
         
     def dealt_cards(self):
         keys = game.key.get_pressed()
@@ -709,7 +740,15 @@ class Player:
         # else: 
         #     card = game_state.king_c
 
-        if self.deal_flag != 0:
+        if (time.time() - game_state.inital_player_hand_time) > 1:
+            game_state.initial_player_hand_time_flag += 1
+            game_state.inital_player_hand_time = time.time()
+
+        if self.deal_flag != 0 and game_state.initial_player_hand_time_flag == 1:
+            game_state.screen.blit(self.card_display(card1, suite1), self.card_position_generator(0))
+            #game_state.screen.blit(self.card_display(card2, suite2), self.card_position_generator(1))
+        
+        if self.deal_flag != 0 and game_state.initial_player_hand_time_flag > 2:
             game_state.screen.blit(self.card_display(card1, suite1), self.card_position_generator(0))
             game_state.screen.blit(self.card_display(card2, suite2), self.card_position_generator(1))
 
@@ -720,7 +759,6 @@ class Player:
             game_state.screen.blit(self.card_display(card3, suite3), self.card_position_generator(2))
         
         if self.hit_flag > 1:
-            game_state.screen.blit(self.card_display(card3, suite3), self.card_position_generator(2))
             game_state.screen.blit(self.card_display(card4, suite4), self.card_position_generator(3))
         
         game.display.flip()
@@ -749,18 +787,50 @@ class Dealer:
         
         return (self.initial_dealer_card_x + (position * self.x_dealer_mov), self.initial_dealer_card_y - (position * self.y_dealer_mov))
     
+    
     def dealer_cards(self):
+
+        # Time checking was implemented to control the animation of the cards, 1 second was allocated for each card showing up on the screen
         
-        if player.deal_flag != 0 and player.stand_flag == 0:
+        if player.deal_flag != 0 and player.stand_flag == 0 and game_state.initial_player_hand_time_flag > 1 and game_state.initial_player_hand_time_flag < 3:
+            # game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            #game_state.screen.blit(game_state.back, self.dealer_position_generator(1))
+            game.display.flip()
+        
+        if player.deal_flag != 0 and player.stand_flag == 0 and game_state.initial_player_hand_time_flag > 3:
             # game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
             game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
             game_state.screen.blit(game_state.back, self.dealer_position_generator(1))
             game.display.flip()
         
+        
         if player.deal_flag !=0 and player.stand_flag !=0:
             game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
             game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
+
+        if player.deal_flag !=0 and player.stand_flag !=0 and game_state.time_flag == 1:
+            game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
+            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(2))
             game.display.flip()
+
+        if (time.time() - game_state.initial_time) > 2:
+            game_state.time_flag += 1
+            game_state.initial_time = time.time()
+
+        if player.deal_flag !=0 and player.stand_flag !=0 and game_state.time_flag == 2:
+            game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
+            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(2))
+            game_state.screen.blit(player.card_display(8, 2), self.dealer_position_generator(3))
+            game.display.flip()
+
+    def time_exp(self):
+
+        if (time.time() - game_state.initial_time) > 2:
+            print("2 seconds have passed")
+            game_state.initial_time = time.time()
 
 
         
