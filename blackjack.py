@@ -181,6 +181,8 @@ class GamePlay:
     win_display_length = 180
     win_display_width = 21
 
+    win_value = 0
+
     bet_display_x_pos = win_display_x_pos
     bet_display_y_pos = win_display_y_pos - 30
     bet_display_length = win_display_length
@@ -195,6 +197,16 @@ class GamePlay:
 
     count_value = 1000
 
+    player_value_display_x_pos = 500
+    player_value_display_y_pos = 600
+    player_value_display_length = 80
+    player_value_display_width = 50
+
+    dealer_value_display_x_pos = 500
+    dealer_value_display_y_pos = 200
+    dealer_value_display_length = 80
+    dealer_value_display_width = 50
+
     initial_time = pow(10,99)
     inital_player_hand_time = pow(10,99)
     inital_dealer_hand_time = pow(10,99)
@@ -208,6 +220,7 @@ class GamePlay:
     
     def status_display(self):
         font = game.font.SysFont("calibri", 20)
+        hand_font = game.font.SysFont("calibri", 40)
 
         # Bank Roll Display
         game.draw.rect(game_state.screen, (self.boarder), [self.balance_display_x_pos - 1, self.balance_display_y_pos - 1, self.balance_display_length + 2, self.balance_display_width + 2])
@@ -218,7 +231,7 @@ class GamePlay:
         # Win Display
         game.draw.rect(game_state.screen, (self.boarder), [self.win_display_x_pos - 1, self.win_display_y_pos - 1, self.win_display_length + 2, self.win_display_width + 2])
         game.draw.rect(game_state.screen, (self.table_red), [self.win_display_x_pos, self.win_display_y_pos, self.win_display_length, self.win_display_width])
-        bet = font.render("Win                 $1000", True, self.white)
+        bet = font.render("Win:                $" + str(self.win_value), True, self.white)
         self.screen.blit(bet, (self.win_display_x_pos + 7, self.balance_display_y_pos + 2))
 
         # Bet Display
@@ -235,288 +248,40 @@ class GamePlay:
         bet = font.render("Bet:  " + str(self.count_value), True, self.white)
         self.screen.blit(bet, (self.count_display_x_pos + 7, self.count_display_y_pos + 5))
 
+        # Player value counter 
+        game.draw.rect(game_state.screen, (self.boarder), [self.player_value_display_x_pos - 1, self.player_value_display_y_pos - 1, self.player_value_display_length + 2, self.player_value_display_width + 2])
+        game.draw.rect(game_state.screen, (self.table_red), [self.player_value_display_x_pos, self.player_value_display_y_pos, self.player_value_display_length, self.player_value_display_width])
+        counter = hand_font.render(str(player.player_hand_value), True, self.white)
+        self.screen.blit(counter, (530, 605))
 
-
-    def window_init(self):
-        self.pygame_init()
-        game.display.set_caption('Back Jack')
-        self.screen.fill(self.bg_colour)
-        self.screen.blit(self.table_img, (0, 0))
-        self.status_display()
-        game.display.flip()
-    # Create card deck 
-
-
-    # Create game loop
-
-    # Creating Buttons
-
-
-    def game_loop(self):
-
-        running = True
-        player.card_generator()
-        dealer.dealer_card_generator()
-        game_state.window_init()
-        while running:
-            game.time.delay(2)
-            #game_state.window_init()
-            game_state.status_display()
-            player.buttons()
-            player.dealt_cards()
-            dealer.dealer_cards()
-            #dealer.time_exp()
-            #print(game.mouse.get_pos())
-            for event in game.event.get():
-
-                if event.type == game.QUIT: 
-                    running = False
-                    game.quit()
-                    sys.exit()
-
-
-
-# Class to handle the rules of the player
-class Player:
-    deal_flag = 0
-    hit_flag = 0
-    stand_flag = 0 
-
-    def card_generator(self):
-        global card1, suite1, card2, suite2 , card3, suite3, card4, suite4
-        card1 = random.randint(1, 13)
-        suite1 = random.randint(1,4)
-
-        card2 = random.randint(1, 13)
-        suite2 = random.randint(1,4)
-
-        card3 = random.randint(1, 13)
-        suite3 = random.randint(1,4)
-
-        card4 = random.randint(1, 13)
-        suite4 = random.randint(1,4)
-
-    # Action buttons
-
-    def buttons(self):
-        font = game.font.SysFont("calibri", 20)
-
-        font_x_pos = 20
-        font_y_pos = 5
-
-        btn_colour = (112, 10, 10)
+        if player.player_hand_value > 9:
+            game.draw.rect(game_state.screen, (self.boarder), [self.player_value_display_x_pos - 1, self.player_value_display_y_pos - 1, self.player_value_display_length + 2, self.player_value_display_width + 2])
+            game.draw.rect(game_state.screen, (self.table_red), [self.player_value_display_x_pos, self.player_value_display_y_pos, self.player_value_display_length, self.player_value_display_width])
+            counter = hand_font.render(str(player.player_hand_value), True, self.white)
+            self.screen.blit(counter, (520, 605))
         
 
-        # Split button
-        split_x_pos = 350
-        split_y_pos = 725
+        # Dealer value counter 
+        game.draw.rect(game_state.screen, (self.boarder), [self.dealer_value_display_x_pos - 1, self.dealer_value_display_y_pos - 1, self.dealer_value_display_length + 2, self.dealer_value_display_width + 2])
+        game.draw.rect(game_state.screen, (self.table_red), [self.dealer_value_display_x_pos, self.dealer_value_display_y_pos, self.dealer_value_display_length, self.dealer_value_display_width])
+        counter = hand_font.render(str(dealer.dealer_hand_value), True, self.white)
+        self.screen.blit(counter, (self.dealer_value_display_x_pos + 30, self.dealer_value_display_y_pos + 5))
 
-        split_x_len = 90
-        split_y_len = 55
-        split = font.render("SPLIT", True, game_state.white)
-        game.draw.rect(game_state.screen, (game_state.boarder), [split_x_pos - 1, split_y_pos - 1, split_x_len + 2, split_y_len + 2])
-        game.draw.rect(game_state.screen, (btn_colour),[split_x_pos, split_y_pos, split_x_len, split_y_len])
-        game_state.screen.blit(split, (split_x_pos + (0.27 * split_x_len), split_y_pos + (0.3 * split_y_len)))
+        if dealer.dealer_hand_value > 9:
+            game.draw.rect(game_state.screen, (self.boarder), [self.dealer_value_display_x_pos - 1, self.dealer_value_display_y_pos - 1, self.dealer_value_display_length + 2, self.dealer_value_display_width + 2])
+            game.draw.rect(game_state.screen, (self.table_red), [self.dealer_value_display_x_pos, self.dealer_value_display_y_pos, self.dealer_value_display_length, self.dealer_value_display_width])
+            counter = hand_font.render(str(dealer.dealer_hand_value), True, self.white)
+            self.screen.blit(counter, (self.dealer_value_display_x_pos + 20, self.dealer_value_display_y_pos + 5))
+    
+    def face_value(self, card):
 
-        if game.mouse.get_pos()[0] > split_x_pos and game.mouse.get_pos()[0] < split_x_pos + split_x_len:
-            if game.mouse.get_pos()[1] > split_y_pos and game.mouse.get_pos()[1] < split_y_pos + split_y_len:
-                btn_colour = (70, 10, 10)
-                game.draw.rect(game_state.screen, (btn_colour),[split_x_pos, split_y_pos, split_x_len, split_y_len])
-                game_state.screen.blit(split, (split_x_pos + (0.27 * split_x_len), split_y_pos + (0.25 * split_y_len)))
-                for event in game.event.get():
-                    if event.type == game.MOUSEBUTTONDOWN:
-                        print("SPLIT CLICKED")
-                        btn_colour = (112, 10, 10)
-                        game.draw.rect(game_state.screen, (btn_colour),[split_x_pos, split_y_pos, split_x_len, split_y_len])
-                        game_state.screen.blit(split, (split_x_pos + (0.27 * split_x_len), split_y_pos + (0.3 * split_y_len)))
-
-
-        # Hit button 
-        hit_x_pos = split_x_pos + 200
-        hit_y_pos = split_y_pos
-
-        hit_x_len = split_x_len
-        hit_y_len = split_y_len
-        hit = font.render("HIT", True, game_state.white)
-        game.draw.rect(game_state.screen, (game_state.boarder), [hit_x_pos - 1, hit_y_pos - 1, hit_x_len + 2, hit_y_len + 2])
-        game.draw.rect(game_state.screen, (game_state.table_red),[hit_x_pos, hit_y_pos, hit_x_len, hit_y_len])
-        game_state.screen.blit(hit, (hit_x_pos + (0.35 * hit_x_len), split_y_pos + (0.3 * split_y_len)))
-
-        if game.mouse.get_pos()[0] > hit_x_pos and game.mouse.get_pos()[0] < hit_x_pos + hit_x_len:
-            if game.mouse.get_pos()[1] > hit_y_pos and game.mouse.get_pos()[1] < hit_y_pos + hit_y_len:
-                btn_colour = (70, 10, 10)
-                game.draw.rect(game_state.screen, (btn_colour),[hit_x_pos, hit_y_pos, hit_x_len, hit_y_len])
-                game_state.screen.blit(hit, (hit_x_pos + (0.35 * hit_x_len), hit_y_pos + (0.25 * hit_y_len)))
-                for event in game.event.get():
-                    if event.type == game.MOUSEBUTTONDOWN and self.deal_flag != 0:
-                        print("HIT CLICKED")
-                        btn_colour = (112, 10, 10)
-                        game.draw.rect(game_state.screen, (game_state.table_red),[hit_x_pos, hit_y_pos, hit_x_len, hit_y_len])
-                        game_state.screen.blit(hit, (hit_x_pos + (0.35 * hit_x_len), hit_y_pos + (0.3 * hit_y_len)))
-                        self.hit_flag += 1
-
-        # Stand button 
-        stand_x_pos = hit_x_pos + 200
-        stand_y_pos = split_y_pos
-
-        stand_x_len = split_x_len
-        stand_y_len = split_y_len
-        stand = font.render("STAND", True, game_state.white)
-
-        game.draw.rect(game_state.screen, (game_state.boarder), [stand_x_pos - 1, stand_y_pos - 1, stand_x_len + 2, stand_y_len + 2])
-        game.draw.rect(game_state.screen, (game_state.table_red),[stand_x_pos, stand_y_pos, stand_x_len, stand_y_len])
-        game_state.screen.blit(stand, (stand_x_pos + font_x_pos, split_y_pos + (0.3 * split_y_len)))
-
-        if game.mouse.get_pos()[0] > stand_x_pos and game.mouse.get_pos()[0] < stand_x_pos + stand_x_len:
-            if game.mouse.get_pos()[1] > stand_y_pos and game.mouse.get_pos()[1] < stand_y_pos + stand_y_len:
-                btn_colour = (70, 10, 10)
-                game.draw.rect(game_state.screen, (btn_colour),[stand_x_pos, stand_y_pos, stand_x_len, stand_y_len])
-                game_state.screen.blit(stand, (stand_x_pos + font_x_pos, split_y_pos + (0.25 * split_y_len)))
-                for event in game.event.get():
-                    if event.type == game.MOUSEBUTTONDOWN and self.deal_flag != 0 or self.stand_flag !=0:
-                        print("STAND CLICKED")
-                        btn_colour = (112, 10, 10)
-                        game.draw.rect(game_state.screen, (game_state.table_red),[stand_x_pos, stand_y_pos, stand_x_len, stand_y_len])
-                        game_state.screen.blit(stand, (stand_x_pos + font_x_pos, split_y_pos + (0.3 * split_y_len)))
-                        self.stand_flag += 1
-                        game_state.initial_time = time.time()
-
-        # Double down button
-        double_x_pos = stand_x_pos + 200
-        double_y_pos = split_y_pos
-
-        double_x_len = stand_x_len
-        double_y_len = stand_y_len
-        double = font.render("DOUBLE", True, game_state.white)
-        game.draw.rect(game_state.screen, (game_state.boarder), [double_x_pos - 1, double_y_pos - 1, double_x_len + 2, double_y_len + 2])
-        game.draw.rect(game_state.screen, (game_state.table_red),[double_x_pos, double_y_pos, double_x_len, stand_y_len])
-        game_state.screen.blit(double, (double_x_pos + 12, split_y_pos + (0.3 * split_y_len)))
-
-        if game.mouse.get_pos()[0] > double_x_pos and game.mouse.get_pos()[0] < double_x_pos + double_x_len:
-            if game.mouse.get_pos()[1] > double_y_pos and game.mouse.get_pos()[1] < double_y_pos + double_y_len:
-                btn_colour = (70, 10, 10)
-                game.draw.rect(game_state.screen, (btn_colour),[double_x_pos, double_y_pos, double_x_len, double_y_len])
-                game_state.screen.blit(double, (double_x_pos + 12, double_y_pos + (0.25 * double_y_len)))
-                for event in game.event.get():
-                    if event.type == game.MOUSEBUTTONDOWN:
-                        print("DOUBLE CLICKED")
-                        btn_colour = (112, 10, 10)
-                        game.draw.rect(game_state.screen, (game_state.table_red),[double_x_pos, double_y_pos, double_x_len, stand_y_len])
-                        game_state.screen.blit(double, (double_x_pos + 12, split_y_pos + (0.3 * split_y_len)))
-        
-        # Bet add button 
-        sub_x_pos = game_state.bet_display_x_pos 
-        sub_y_pos =  615
-
-        sub_x_len = 30
-        sub_y_len = 30
-
-        sub = font.render("-", True, game_state.white)
-        game.draw.rect(game_state.screen, (game_state.boarder), [sub_x_pos - 1, sub_y_pos - 1, sub_x_len + 2, sub_y_len + 2])
-        game.draw.rect(game_state.screen, (game_state.table_red),[sub_x_pos, sub_y_pos, sub_x_len, sub_y_len])
-
-        game_state.screen.blit(sub, (sub_x_pos + 10, sub_y_pos + 6))
-        
-        if game.mouse.get_pos()[0] > sub_x_pos and game.mouse.get_pos()[0] < sub_x_pos + sub_x_len:
-            if game.mouse.get_pos()[1] > sub_y_pos and game.mouse.get_pos()[1] < sub_y_pos + sub_y_len:
-                btn_colour = (70, 10, 10)
-                game.draw.rect(game_state.screen, (btn_colour),[sub_x_pos, sub_y_pos, sub_x_len, sub_y_len])
-                game_state.screen.blit(sub, (sub_x_pos + 10, sub_y_pos + 4))
-            for event in game.event.get():
-                        if event.type == game.MOUSEBUTTONDOWN:
-                            print("ADD CLICKED")
-                            btn_colour = (112, 10, 10)
-                            game.draw.rect(game_state.screen, (game_state.table_red),[sub_x_pos, sub_y_pos, sub_x_len, sub_y_len])
-                            game_state.screen.blit(sub, (sub_x_pos + 10, sub_y_pos + 6))
-                            game_state.count_value -= 50
-
-                            if game_state.count_value < 0:
-                                game_state.count_value = 0
-        
-
-        # Bet subtract button 
-        add_x_pos = 1350
-        add_y_pos =  sub_y_pos
-
-        add_x_len = 30
-        add_y_len = 30
-
-        add = font.render("+", True, game_state.white)
-        game.draw.rect(game_state.screen, (game_state.boarder), [add_x_pos - 1, add_y_pos - 1, add_x_len + 2, add_y_len + 2])
-        game.draw.rect(game_state.screen, (game_state.table_red),[add_x_pos, add_y_pos, add_x_len, add_y_len])
-
-        game_state.screen.blit(add, (add_x_pos + 10, add_y_pos + 6))
-        
-        if game.mouse.get_pos()[0] > add_x_pos and game.mouse.get_pos()[0] < add_x_pos + add_x_len:
-            if game.mouse.get_pos()[1] > add_y_pos and game.mouse.get_pos()[1] < add_y_pos + add_y_len:
-                btn_colour = (70, 10, 10)
-                game.draw.rect(game_state.screen, (btn_colour),[add_x_pos, add_y_pos, add_x_len, add_y_len])
-                game_state.screen.blit(add, (add_x_pos + 10, add_y_pos + 4))
-            for event in game.event.get():
-                        if event.type == game.MOUSEBUTTONDOWN:
-                            print("ADD CLICKED")
-                            btn_colour = (112, 10, 10)
-                            game.draw.rect(game_state.screen, (game_state.table_red),[add_x_pos, add_y_pos, add_x_len, add_y_len])
-                            game_state.screen.blit(add, (add_x_pos + 10, add_y_pos + 6))
-                            game_state.count_value += 50
-
-                            if game_state.count_value > game_state.initial_balance:
-                                game_state.count_value = game_state.initial_balance
-        
-
-        # Deal button
-
-        deal_x_pos = 1240
-        deal_y_pos = 660
-        deal_x_len = 100
-        deal_y_len = 30
-        
-        deal = font.render("DEAL", True, game_state.white)
-        game.draw.rect(game_state.screen, (game_state.boarder), [deal_x_pos - 1, deal_y_pos - 1, deal_x_len + 2, deal_y_len + 2])
-        game.draw.rect(game_state.screen, (game_state.table_red),[deal_x_pos, deal_y_pos, deal_x_len, deal_y_len])
-
-        game_state.screen.blit(deal, (deal_x_pos + 10, deal_y_pos + 6))
-        
-        if game.mouse.get_pos()[0] > deal_x_pos and game.mouse.get_pos()[0] < deal_x_pos + deal_x_len:
-            if game.mouse.get_pos()[1] > deal_y_pos and game.mouse.get_pos()[1] < deal_y_pos + deal_y_len:
-                btn_colour = (70, 10, 10)
-                game.draw.rect(game_state.screen, (btn_colour),[deal_x_pos, deal_y_pos, deal_x_len, deal_y_len])
-                game_state.screen.blit(deal, (deal_x_pos + 10, deal_y_pos + 4))
-            for event in game.event.get():
-                        if event.type == game.MOUSEBUTTONDOWN:
-                            print("DEAL CLICKED")
-                            btn_colour = (112, 10, 10)
-                            game.draw.rect(game_state.screen, (game_state.table_red),[deal_x_pos, deal_y_pos, deal_x_len, deal_y_len])
-                            game_state.screen.blit(deal, (deal_x_pos + 10, deal_y_pos + 6))
-                            self.deal_flag += 1
-                            game_state.bet_value = game_state.count_value
-                            game_state.initial_balance = game_state.initial_balance - game_state.count_value
-
-                            if game_state.initial_balance < 0:
-                                game_state.initial_balance = 0
-                            
-                            game_state.inital_player_hand_time = time.time()
-
-
-
-    # Card positions 
-    initial_card_x = 630
-    initial_card_y = 530
-    x_mov = 40
-    y_mov = 30
-
-    def card_position_generator(self, position):
-
-        return (self.initial_card_x + (position * self.x_mov), self.initial_card_y - (position * self.y_mov))
-
-    hand_value = 0
-    player_hand_value = 0
-
-    # Player money 
-
-    starting_value = 1000
-    increment = 50
-
+        if card >= 10 and card <= 13:
+            return 10
+        elif card == 1:
+            return 11
+        else: 
+            return card
+    
     def card_display(self, card, suite):
 
         if card == 1:
@@ -563,7 +328,7 @@ class Player:
             if suite == 4:
                 return game_state.three_h
             
-    
+
         if card == 4:
 
             if suite == 1:
@@ -610,7 +375,7 @@ class Player:
             if suite == 4:
                 return game_state.six_h
             
-    
+
         if card == 7:
 
             if suite == 1:
@@ -719,50 +484,419 @@ class Player:
             
             if suite == 4:
                 return game_state.king_h
-        
-            
     
-    def face_value(self, card):
+    def win_check(self):
 
-        if card >= 10 and card <= 13:
-            return 10
-        elif card == 1:
-            return 11
-        else: 
-            return card
-            
+        # Checking for losses, a return of 0 means the player lost, 1 means the player won, 2 means the player got black jack and 3 means the dealer got black jack
+
+        if player.player_hand_value > 21:
+            return 0
+        if player.player_hand_value <= 21 and dealer.dealer_card_total_value <= 21:
+            if player.player_hand_value <= dealer.dealer_card_total_value:
+                return 0
+            if player.player_hand_value > dealer.dealer_card_total_value:
+                return 1
         
+        if player.deal_flag != 0 and player.hit_flag == 0 and player.stand_flag == 0 and player.player_hand_value == 21:
+            return 2
+        
+        if dealer.player_hand_value == 21:
+            return 3
+
+    def window_init(self):
+        self.pygame_init()
+        game.display.set_caption('Back Jack')
+        self.screen.fill(self.bg_colour)
+        self.screen.blit(self.table_img, (0, 0))
+        self.status_display()
+        game.display.flip()
+    # Create card deck 
+
+
+    # Create game loop
+
+    # Creating Buttons
+
+
+    def game_loop(self):
+
+        running = True
+        player.card_generator()
+        dealer.dealer_card_generator()
+        game_state.window_init()
+        while running:
+            #game.time.delay(2)
+            #game_state.window_init()
+            game_state.status_display()
+            player.buttons()
+            player.dealt_cards()
+            dealer.dealer_cards()
+            #dealer.time_exp()
+            #print(game.mouse.get_pos())
+            for event in game.event.get():
+
+                if event.type == game.QUIT: 
+                    running = False
+                    game.quit()
+                    sys.exit()
+
+
+
+# Class to handle the rules of the player
+class Player:
+    deal_flag = 0
+    hit_flag = 0
+    stand_flag = 0 
+
+    def card_generator(self):
+        global card1, suite1, card2, suite2 , card3, suite3, card4, suite4
+        card1 = random.randint(1, 13)
+        suite1 = random.randint(1,4)
+
+        card2 = random.randint(1, 13)
+        suite2 = random.randint(1,4)
+
+        card3 = random.randint(1, 13)
+        suite3 = random.randint(1,4)
+
+        card4 = random.randint(1, 13)
+        suite4 = random.randint(1,4)
+
+    # Action buttons
+    game.font.init()
+    font = game.font.SysFont("calibri", 20)
+    split_x_pos = 350
+    split_y_pos = 725
+
+    split_x_len = 90
+    split_y_len = 55
+    def split_action(self):
+        split = self.font.render("SPLIT", True, game_state.white)
+
+        btn_colour = (70, 10, 10)
+        game.draw.rect(game_state.screen, (btn_colour),[self.split_x_pos, self.split_y_pos, self.split_x_len, self.split_y_len])
+        game_state.screen.blit(split, (self.split_x_pos + (0.27 * self.split_x_len), self.split_y_pos + (0.25 * self.split_y_len)))
+        for event in game.event.get():
+            if event.type == game.MOUSEBUTTONDOWN:
+                print("SPLIT CLICKED")
+                btn_colour = (112, 10, 10)
+                game.draw.rect(game_state.screen, (btn_colour),[self.split_x_pos, self.split_y_pos, self.split_x_len, self.split_y_len])
+                game_state.screen.blit(split, (self.split_x_pos + (0.27 * self.split_x_len), self.split_y_pos + (0.3 * self.split_y_len)))
+    
+    hit_x_pos = split_x_pos + 200
+    hit_y_pos = split_y_pos
+
+    hit_x_len = split_x_len
+    hit_y_len = split_y_len
+    def hit_action(self):
+
+        hit = self.font.render("HIT", True, game_state.white)
+
+        print("HIT CLICKED")
+
+        game.draw.rect(game_state.screen, (game_state.table_red),[self.hit_x_pos, self.hit_y_pos, self.hit_x_len, self.hit_y_len])
+        game_state.screen.blit(hit, (self.hit_x_pos + (0.35 * self.hit_x_len), self.hit_y_pos + (0.3 * self.hit_y_len)))
+        self.hit_flag += 1
+
+    stand_x_pos = hit_x_pos + 200
+    stand_y_pos = split_y_pos
+
+    stand_x_len = split_x_len
+    stand_y_len = split_y_len
+    def stand_action(self):
+        stand = self.font.render("STAND", True, game_state.white)
+        print("STAND CLICKED")
+        game.draw.rect(game_state.screen, (game_state.table_red),[self.stand_x_pos, self.stand_y_pos, self.stand_x_len, self.stand_y_len])
+        game_state.screen.blit(stand, (self.stand_x_pos + 20, self.split_y_pos + (0.3 * self.split_y_len)))
+        self.stand_flag += 1
+        game_state.initial_time = time.time()
+
+
+    def double_action(self):
+        pass
+
+    def deal_action(self):
+
+        self.deal_flag += 1
+        game_state.bet_value = game_state.count_value
+        game_state.initial_balance = game_state.initial_balance - game_state.count_value
+
+        if game_state.initial_balance < 0:
+            game_state.initial_balance = 0
+        
+        game_state.inital_player_hand_time = time.time()
+
+    hit_btn_time_init = 0
+    hit_btn_flag = 0
+
+    stand_btn_time_init = 0
+    stand_btn_flag = 0
+
+    def buttons(self):
+        font = game.font.SysFont("calibri", 20)
+
+        font_x_pos = 20
+        font_y_pos = 5
+
+        btn_colour = (112, 10, 10)
+        
+        keys = game.key.get_pressed()
+        # Split button
+        split_x_pos = 350
+        split_y_pos = 725
+
+        split_x_len = 90
+        split_y_len = 55
+        split = font.render("SPLIT", True, game_state.white)
+        game.draw.rect(game_state.screen, (game_state.boarder), [split_x_pos - 1, split_y_pos - 1, split_x_len + 2, split_y_len + 2])
+        game.draw.rect(game_state.screen, (btn_colour),[split_x_pos, split_y_pos, split_x_len, split_y_len])
+        game_state.screen.blit(split, (split_x_pos + (0.27 * split_x_len), split_y_pos + (0.3 * split_y_len)))
+
+        if keys[game.K_PERIOD]:
+            self.split_action()
+
+        if game.mouse.get_pos()[0] > split_x_pos and game.mouse.get_pos()[0] < split_x_pos + split_x_len:
+            if game.mouse.get_pos()[1] > split_y_pos and game.mouse.get_pos()[1] < split_y_pos + split_y_len:
+                self.split_action()
+                # btn_colour = (70, 10, 10)
+                # game.draw.rect(game_state.screen, (btn_colour),[split_x_pos, split_y_pos, split_x_len, split_y_len])
+                # game_state.screen.blit(split, (split_x_pos + (0.27 * split_x_len), split_y_pos + (0.25 * split_y_len)))
+                # for event in game.event.get():
+                #     if event.type == game.MOUSEBUTTONDOWN:
+                #         print("SPLIT CLICKED")
+                #         btn_colour = (112, 10, 10)
+                #         game.draw.rect(game_state.screen, (btn_colour),[split_x_pos, split_y_pos, split_x_len, split_y_len])
+                #         game_state.screen.blit(split, (split_x_pos + (0.27 * split_x_len), split_y_pos + (0.3 * split_y_len)))
+
+
+        # Hit button 
+        hit_x_pos = split_x_pos + 200
+        hit_y_pos = split_y_pos
+
+        hit_x_len = split_x_len
+        hit_y_len = split_y_len
+        hit = font.render("HIT", True, game_state.white)
+        game.draw.rect(game_state.screen, (game_state.boarder), [hit_x_pos - 1, hit_y_pos - 1, hit_x_len + 2, hit_y_len + 2])
+        game.draw.rect(game_state.screen, (game_state.table_red),[hit_x_pos, hit_y_pos, hit_x_len, hit_y_len])
+        game_state.screen.blit(hit, (hit_x_pos + (0.35 * hit_x_len), split_y_pos + (0.3 * split_y_len)))
+
+        if (time.time() - self.hit_btn_time_init) > 1:
+            self.hit_btn_flag += 1
+            self.hit_btn_time_init = time.time()
+
+        if keys[game.K_h] and self.hit_btn_flag != 0 and self.deal_flag != 0:
+            self.hit_action()
+            self.hit_btn_flag = 0
+
+        if game.mouse.get_pos()[0] > hit_x_pos and game.mouse.get_pos()[0] < hit_x_pos + hit_x_len:
+            if game.mouse.get_pos()[1] > hit_y_pos and game.mouse.get_pos()[1] < hit_y_pos + hit_y_len:
+                btn_colour = (70, 10, 10)
+                game.draw.rect(game_state.screen, (btn_colour),[hit_x_pos, hit_y_pos, hit_x_len, hit_y_len])
+                game_state.screen.blit(hit, (hit_x_pos + (0.35 * hit_x_len), hit_y_pos + (0.25 * hit_y_len)))
+                for event in game.event.get():
+                    if event.type == game.MOUSEBUTTONDOWN and self.deal_flag != 0:
+                        self.hit_action()
+
+        # Stand button 
+        stand_x_pos = hit_x_pos + 200
+        stand_y_pos = split_y_pos
+
+        stand_x_len = split_x_len
+        stand_y_len = split_y_len
+        stand = font.render("STAND", True, game_state.white)
+
+        game.draw.rect(game_state.screen, (game_state.boarder), [stand_x_pos - 1, stand_y_pos - 1, stand_x_len + 2, stand_y_len + 2])
+        game.draw.rect(game_state.screen, (game_state.table_red),[stand_x_pos, stand_y_pos, stand_x_len, stand_y_len])
+        game_state.screen.blit(stand, (stand_x_pos + font_x_pos, split_y_pos + (0.3 * split_y_len)))
+
+        if (time.time() - self.stand_btn_time_init) > 1:
+            self.stand_btn_flag += 1
+            self.stand_btn_time_init = time.time()
+
+        if keys[game.K_s] and self.stand_btn_flag != 0:
+            self.stand_action()
+            self.stand_btn_flag = 0
+
+        if game.mouse.get_pos()[0] > stand_x_pos and game.mouse.get_pos()[0] < stand_x_pos + stand_x_len:
+            if game.mouse.get_pos()[1] > stand_y_pos and game.mouse.get_pos()[1] < stand_y_pos + stand_y_len:
+                btn_colour = (70, 10, 10)
+                game.draw.rect(game_state.screen, (btn_colour),[stand_x_pos, stand_y_pos, stand_x_len, stand_y_len])
+                game_state.screen.blit(stand, (stand_x_pos + font_x_pos, split_y_pos + (0.25 * split_y_len)))
+                for event in game.event.get():
+                    if event.type == game.MOUSEBUTTONDOWN and self.deal_flag != 0 or self.stand_flag !=0:
+                        self.stand_action()
+
+        # Double down button
+        double_x_pos = stand_x_pos + 200
+        double_y_pos = split_y_pos
+
+        double_x_len = stand_x_len
+        double_y_len = stand_y_len
+        double = font.render("DOUBLE", True, game_state.white)
+        game.draw.rect(game_state.screen, (game_state.boarder), [double_x_pos - 1, double_y_pos - 1, double_x_len + 2, double_y_len + 2])
+        game.draw.rect(game_state.screen, (game_state.table_red),[double_x_pos, double_y_pos, double_x_len, stand_y_len])
+        game_state.screen.blit(double, (double_x_pos + 12, split_y_pos + (0.3 * split_y_len)))
+
+        if game.mouse.get_pos()[0] > double_x_pos and game.mouse.get_pos()[0] < double_x_pos + double_x_len:
+            if game.mouse.get_pos()[1] > double_y_pos and game.mouse.get_pos()[1] < double_y_pos + double_y_len:
+                btn_colour = (70, 10, 10)
+                game.draw.rect(game_state.screen, (btn_colour),[double_x_pos, double_y_pos, double_x_len, double_y_len])
+                game_state.screen.blit(double, (double_x_pos + 12, double_y_pos + (0.25 * double_y_len)))
+                for event in game.event.get():
+                    if event.type == game.MOUSEBUTTONDOWN:
+                        print("DOUBLE CLICKED")
+                        btn_colour = (112, 10, 10)
+                        game.draw.rect(game_state.screen, (game_state.table_red),[double_x_pos, double_y_pos, double_x_len, stand_y_len])
+                        game_state.screen.blit(double, (double_x_pos + 12, split_y_pos + (0.3 * split_y_len)))
+        
+        # Bet add button 
+        sub_x_pos = game_state.bet_display_x_pos 
+        sub_y_pos =  615
+
+        sub_x_len = 30
+        sub_y_len = 30
+
+        sub = font.render("-", True, game_state.white)
+        game.draw.rect(game_state.screen, (game_state.boarder), [sub_x_pos - 1, sub_y_pos - 1, sub_x_len + 2, sub_y_len + 2])
+        game.draw.rect(game_state.screen, (game_state.table_red),[sub_x_pos, sub_y_pos, sub_x_len, sub_y_len])
+
+        game_state.screen.blit(sub, (sub_x_pos + 10, sub_y_pos + 6))
+        
+        if game.mouse.get_pos()[0] > sub_x_pos and game.mouse.get_pos()[0] < sub_x_pos + sub_x_len:
+            if game.mouse.get_pos()[1] > sub_y_pos and game.mouse.get_pos()[1] < sub_y_pos + sub_y_len:
+                btn_colour = (70, 10, 10)
+                game.draw.rect(game_state.screen, (btn_colour),[sub_x_pos, sub_y_pos, sub_x_len, sub_y_len])
+                game_state.screen.blit(sub, (sub_x_pos + 10, sub_y_pos + 4))
+            for event in game.event.get():
+                        if event.type == game.MOUSEBUTTONDOWN:
+                            print("ADD CLICKED")
+                            btn_colour = (112, 10, 10)
+                            game.draw.rect(game_state.screen, (game_state.table_red),[sub_x_pos, sub_y_pos, sub_x_len, sub_y_len])
+                            game_state.screen.blit(sub, (sub_x_pos + 10, sub_y_pos + 6))
+                            game_state.count_value -= 50
+
+                            if game_state.count_value < 0:
+                                game_state.count_value = 0
+        
+
+        # Bet subtract button 
+        add_x_pos = 1350
+        add_y_pos =  sub_y_pos
+
+        add_x_len = 30
+        add_y_len = 30
+
+        add = font.render("+", True, game_state.white)
+        game.draw.rect(game_state.screen, (game_state.boarder), [add_x_pos - 1, add_y_pos - 1, add_x_len + 2, add_y_len + 2])
+        game.draw.rect(game_state.screen, (game_state.table_red),[add_x_pos, add_y_pos, add_x_len, add_y_len])
+
+        game_state.screen.blit(add, (add_x_pos + 10, add_y_pos + 6))
+        
+        if game.mouse.get_pos()[0] > add_x_pos and game.mouse.get_pos()[0] < add_x_pos + add_x_len:
+            if game.mouse.get_pos()[1] > add_y_pos and game.mouse.get_pos()[1] < add_y_pos + add_y_len:
+                btn_colour = (70, 10, 10)
+                game.draw.rect(game_state.screen, (btn_colour),[add_x_pos, add_y_pos, add_x_len, add_y_len])
+                game_state.screen.blit(add, (add_x_pos + 10, add_y_pos + 4))
+            for event in game.event.get():
+                        if event.type == game.MOUSEBUTTONDOWN:
+                            print("ADD CLICKED")
+                            btn_colour = (112, 10, 10)
+                            game.draw.rect(game_state.screen, (game_state.table_red),[add_x_pos, add_y_pos, add_x_len, add_y_len])
+                            game_state.screen.blit(add, (add_x_pos + 10, add_y_pos + 6))
+                            game_state.count_value += 50
+
+                            if game_state.count_value > game_state.initial_balance:
+                                game_state.count_value = game_state.initial_balance
+        
+
+        # Deal button
+
+        deal_x_pos = 1240
+        deal_y_pos = 660
+        deal_x_len = 100
+        deal_y_len = 30
+        
+        deal = font.render("DEAL", True, game_state.white)
+        game.draw.rect(game_state.screen, (game_state.boarder), [deal_x_pos - 1, deal_y_pos - 1, deal_x_len + 2, deal_y_len + 2])
+        game.draw.rect(game_state.screen, (game_state.table_red),[deal_x_pos, deal_y_pos, deal_x_len, deal_y_len])
+
+        game_state.screen.blit(deal, (deal_x_pos + 10, deal_y_pos + 6))
+
+
+        if keys[game.K_d]:
+            self.deal_action()
+            btn_colour = (70, 10, 10)
+            game.draw.rect(game_state.screen, (btn_colour),[deal_x_pos, deal_y_pos, deal_x_len, deal_y_len])
+            game_state.screen.blit(deal, (deal_x_pos + 10, deal_y_pos + 4))
+        
+        if game.mouse.get_pos()[0] > deal_x_pos and game.mouse.get_pos()[0] < deal_x_pos + deal_x_len:
+            if game.mouse.get_pos()[1] > deal_y_pos and game.mouse.get_pos()[1] < deal_y_pos + deal_y_len:
+                btn_colour = (70, 10, 10)
+                game.draw.rect(game_state.screen, (btn_colour),[deal_x_pos, deal_y_pos, deal_x_len, deal_y_len])
+                game_state.screen.blit(deal, (deal_x_pos + 10, deal_y_pos + 4))
+            for event in game.event.get():
+                        if event.type == game.MOUSEBUTTONDOWN:
+                            self.deal_action()
+                            print("DEAL CLICKED")
+                            btn_colour = (112, 10, 10)
+                            game.draw.rect(game_state.screen, (game_state.table_red),[deal_x_pos, deal_y_pos, deal_x_len, deal_y_len])
+                            game_state.screen.blit(deal, (deal_x_pos + 10, deal_y_pos + 6))
+
+
+
+    # Card positions 
+    initial_card_x = 630
+    initial_card_y = 530
+    x_mov = 40
+    y_mov = 30
+
+    def card_position_generator(self, position):
+
+        return (self.initial_card_x + (position * self.x_mov), self.initial_card_y - (position * self.y_mov))
+
+    hand_value = 0
+    player_hand_value = 0
+
+    # Player money 
+
+    starting_value = 1000
+    increment = 50
+
+    # Card count
+    card_value_total = 0
+
     def dealt_cards(self):
         keys = game.key.get_pressed()
-
-        # if draw == 1:
-        #     card = game_state.ace_d
-        # else: 
-        #     card = game_state.king_c
 
         if (time.time() - game_state.inital_player_hand_time) > 1:
             game_state.initial_player_hand_time_flag += 1
             game_state.inital_player_hand_time = time.time()
 
         if self.deal_flag != 0 and game_state.initial_player_hand_time_flag == 1:
-            game_state.screen.blit(self.card_display(card1, suite1), self.card_position_generator(0))
-            #game_state.screen.blit(self.card_display(card2, suite2), self.card_position_generator(1))
+            game_state.screen.blit(game_state.card_display(card1, suite1), self.card_position_generator(0))
+            self.player_hand_value = game_state.face_value(card1)
+            #game_state.screen.blit(game_state.card_display(card2, suite2), self.card_position_generator(1))
         
         if self.deal_flag != 0 and game_state.initial_player_hand_time_flag > 2:
-            game_state.screen.blit(self.card_display(card1, suite1), self.card_position_generator(0))
-            game_state.screen.blit(self.card_display(card2, suite2), self.card_position_generator(1))
+            game_state.screen.blit(game_state.card_display(card1, suite1), self.card_position_generator(0))
+            game_state.screen.blit(game_state.card_display(card2, suite2), self.card_position_generator(1))
+            self.player_hand_value = game_state.face_value(card1) + game_state.face_value(card2)
+
+        if game_state.initial_player_hand_time_flag < 4:
+            self.hit_flag = 0
 
         # if keys[game.K_d]:
         #     game_state.screen.blit(game_state.three_d, self.second_card_pos)
 
-        if self.hit_flag > 0:
-            game_state.screen.blit(self.card_display(card3, suite3), self.card_position_generator(2))
+        if self.hit_flag > 0 and game_state.initial_player_hand_time_flag > 3:
+            game_state.screen.blit(game_state.card_display(card3, suite3), self.card_position_generator(2))
+            self.player_hand_value = game_state.face_value(card1) + game_state.face_value(card2) + game_state.face_value(card3)
         
-        if self.hit_flag > 1:
-            game_state.screen.blit(self.card_display(card4, suite4), self.card_position_generator(3))
+        if self.hit_flag > 1 and game_state.initial_player_hand_time_flag > 3:
+            game_state.screen.blit(game_state.card_display(card4, suite4), self.card_position_generator(3))
+            self.player_hand_value = game_state.face_value(card1) + game_state.face_value(card2) + game_state.face_value(card3) + game_state.face_value(card4)
         
         game.display.flip()
-        
 
 
 # Class to handle the rules of the dealer
@@ -770,13 +904,19 @@ class Dealer:
     
     def dealer_card_generator(self):
 
-        global d_card1, d_suite1, d_card2, d_suite2
+        global d_card1, d_suite1, d_card2, d_suite2, d_card3, d_suite3, d_card4, d_suite4
 
         d_card1 = random.randint(1,13)
         d_suite1 = random.randint(1,4)
 
         d_card2 = random.randint(1,13)
         d_suite2 = random.randint(1,4)
+
+        d_card3 = random.randint(1,13)
+        d_suite3 = random.randint(1,4)
+
+        d_card4 = random.randint(1,13)
+        d_suite4 = random.randint(1,4)
     
     initial_dealer_card_x = 630
     initial_dealer_card_y = 200
@@ -787,44 +927,52 @@ class Dealer:
         
         return (self.initial_dealer_card_x + (position * self.x_dealer_mov), self.initial_dealer_card_y - (position * self.y_dealer_mov))
     
-    
+    dealer_hand_value = 0
+    third_card_flag = 0
+
     def dealer_cards(self):
 
         # Time checking was implemented to control the animation of the cards, 1 second was allocated for each card showing up on the screen
         
         if player.deal_flag != 0 and player.stand_flag == 0 and game_state.initial_player_hand_time_flag > 1 and game_state.initial_player_hand_time_flag < 3:
-            # game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
-            game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            # game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
             #game_state.screen.blit(game_state.back, self.dealer_position_generator(1))
+            self.dealer_hand_value = game_state.face_value(d_card1)
             game.display.flip()
         
         if player.deal_flag != 0 and player.stand_flag == 0 and game_state.initial_player_hand_time_flag > 3:
-            # game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
-            game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            # game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
             game_state.screen.blit(game_state.back, self.dealer_position_generator(1))
             game.display.flip()
         
         
-        if player.deal_flag !=0 and player.stand_flag !=0:
-            game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
-            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
+        # A flag for the third card getting dealt was implemented so the code wouldn't run the condition for 2 cards getting dealt which would overlay the current hand
+        if player.deal_flag !=0 and player.stand_flag !=0 and self.third_card_flag == 0:
+            game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            game_state.screen.blit(game_state.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
+            self.dealer_hand_value = game_state.face_value(d_card1) + game_state.face_value(d_card2)
 
-        if player.deal_flag !=0 and player.stand_flag !=0 and game_state.time_flag == 1:
-            game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
-            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
-            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(2))
+        if player.deal_flag !=0 and player.stand_flag !=0 and game_state.time_flag == 1 and self.dealer_hand_value < 17:
+            game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+            game_state.screen.blit(game_state.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
+            game_state.screen.blit(game_state.card_display(d_card3, d_suite3), self.dealer_position_generator(2))
+            self.dealer_hand_value = game_state.face_value(d_card1) + game_state.face_value(d_card2) + game_state.face_value(d_card3)
+            self.third_card_flag += 1
             game.display.flip()
 
         if (time.time() - game_state.initial_time) > 2:
             game_state.time_flag += 1
             game_state.initial_time = time.time()
-
-        if player.deal_flag !=0 and player.stand_flag !=0 and game_state.time_flag == 2:
-            game_state.screen.blit(player.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
-            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
-            game_state.screen.blit(player.card_display(d_card2, d_suite2), self.dealer_position_generator(2))
-            game_state.screen.blit(player.card_display(8, 2), self.dealer_position_generator(3))
-            game.display.flip()
+        
+        if player.deal_flag !=0 and player.stand_flag !=0 and game_state.time_flag == 2 and self.dealer_hand_value < 17: 
+                game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
+                game_state.screen.blit(game_state.card_display(d_card2, d_suite2), self.dealer_position_generator(1))
+                game_state.screen.blit(game_state.card_display(d_card3, d_suite3), self.dealer_position_generator(2))
+                game_state.screen.blit(game_state.card_display(d_card4, d_suite4), self.dealer_position_generator(3))
+                self.dealer_hand_value = game_state.face_value(d_card1) + game_state.face_value(d_card2) + game_state.face_value(d_card3) + game_state.face_value(d_card4)
+                game.display.flip()
 
     def time_exp(self):
 
