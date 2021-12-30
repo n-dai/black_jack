@@ -276,19 +276,14 @@ class GamePlay:
     
     def face_value(self, card, entity):
         
-        if card == 1 and entity == 1:
-            if player.player_hand_value + 11 > 21:
-                print("ace is 1")
-                return 1
-            else:
-                print("ace is 2")
+        if card == 1 and entity == 1 and (player.player_hand_value < 11):
                 return 11
-                
-        
-        if card == 1 and entity == 2:
-            if dealer.dealer_hand_value + 11 > 21:
+        if card == 1 and entity == 1 and player.player_hand_value > 11:
                 return 1
-            else:
+            
+        if card == 1 and entity == 1 and dealer.dealer_hand_value + 11 > 21:
+                return 1
+        if card == 1 and entity == 1 and dealer.dealer_hand_value + 11 <= 21:
                 return 11
 
         if card >= 10 and card <= 13:
@@ -545,21 +540,22 @@ class GamePlay:
         if dealer.dealer_hand_value > 16:
             dealer.round_over_flag += 1
 
-        print(player.player_hand_value, dealer.dealer_hand_value)
-        if player.deal_flag !=0 and player.player_hand_value > 21:
-            print("lost")
+        #print(player.player_hand_value, dealer.dealer_hand_value)
+        #print("The value is:" + str(player.player_hand_value + 11))
+        # if player.deal_flag !=0 and player.player_hand_value > 21:
+        #     print("lost")
         if dealer.round_over_flag != 0:
             if self.win_check(player.player_hand_value, dealer.dealer_hand_value) == 1: 
                 game_state.initial_balance = game_state.remainder + 2 * game_state.bet_value
                 game_state.win_value = 2 * game_state.bet_value
-                print("Hand Won")
+
             if self.win_check(player.player_hand_value, dealer.dealer_hand_value) == 2: 
                 game_state.initial_balance = game_state.remainder + 2.5 * game_state.bet_value
                 game_state.win_value = 2.5 * game_state.bet_value
-                print("Hand Won")
+            
             
             if self.win_check(player.player_hand_value, dealer.dealer_hand_value) == 0:
-                print("lost")
+             
                 dealer.round_over_flag = 0
 
     def window_init(self):
@@ -582,6 +578,7 @@ class GamePlay:
         running = True
         player.card_generator()
         dealer.dealer_card_generator()
+        player.card_value_handle()
         game_state.window_init()
         while running:
             #game.time.delay(2)
@@ -591,8 +588,6 @@ class GamePlay:
             player.dealt_cards()
             dealer.dealer_cards()
             game_state.round_result()
-            #dealer.time_exp()
-            #print(game.mouse.get_pos())
             for event in game.event.get():
 
                 if event.type == game.QUIT: 
@@ -607,18 +602,22 @@ class Player:
     deal_flag = 0
     hit_flag = 0
     stand_flag = 0 
-
+    
+    player_card_arr = []
     def card_generator(self):
         global card1, suite1, card2, suite2 , card3, suite3, card4, suite4
         global card5, suite5, card6, suite6 , card7, suite7, card8, suite8
 
         card1 = random.randint(1, 13)
+        #card1 = 1
         suite1 = random.randint(1,4)
 
         card2 = random.randint(1, 13)
+        #card2 = 13
         suite2 = random.randint(1,4)
 
         card3 = random.randint(1, 13)
+        #card3 = 1
         suite3 = random.randint(1,4)
 
         card4 = random.randint(1, 13)
@@ -636,6 +635,7 @@ class Player:
         card8 = random.randint(1, 13)
         suite8 = random.randint(1,4)
 
+        self.player_card_arr = [card1, card2, card3, card4, card5, card6, card7, card8]
     # Action buttons
     game.font.init()
     font = game.font.SysFont("calibri", 20)
@@ -982,44 +982,93 @@ class Player:
     # Card count
     card_value_total = 0
 
+    def card_value_handle(self):
+    
+        for i in range(8):
+
+            if self.player_card_arr[i] > 9:
+                self.player_card_arr[i] =10
+            
+            if self.player_card_arr[i] == 1:
+                self.player_card_arr[i] = 11
+        
+        for i in range(8):
+
+            if dealer.dealer_card_arr[i] > 9:
+                dealer.dealer_card_arr[i] =10
+            
+            if dealer.dealer_card_arr[i] == 1:
+                dealer.dealer_card_arr[i] = 11
+        
+
+            
+
     def dealt_cards(self):
 
         if (time.time() - game_state.inital_player_hand_time) > 1:
             game_state.initial_player_hand_time_flag += 1
             game_state.inital_player_hand_time = time.time()
 
+        # First card dealt
         if self.deal_flag != 0 and game_state.initial_player_hand_time_flag == 1:
             game_state.screen.blit(game_state.card_display(card1, suite1), self.card_position_generator(0))
-            self.player_hand_value = game_state.face_value(card1, 1)
+            
+            self.player_hand_value = self.player_card_arr[0]
+            #self.player_hand_value = game_state.face_value(card1, 1)
             #game_state.screen.blit(game_state.card_display(card2, suite2), self.card_position_generator(1))
-        
+
+        # Second card dealt
         if self.deal_flag != 0 and game_state.initial_player_hand_time_flag > 2:
             game_state.screen.blit(game_state.card_display(card1, suite1), self.card_position_generator(0))
             game_state.screen.blit(game_state.card_display(card2, suite2), self.card_position_generator(1))
-            self.player_hand_value = game_state.face_value(card1, 1) + game_state.face_value(card2, 1)
 
+            if self.player_card_arr[0] == 11 and self.player_card_arr[1] == 11:
+                self.player_card_arr[1] = 1
+
+            self.player_hand_value = self.player_card_arr[0] + self.player_card_arr[1]
+            #self.player_hand_value = game_state.face_value(card1, 1) + game_state.face_value(card2, 1)
+        
+        # Will increment after all cards are dealt
         if game_state.initial_player_hand_time_flag < 4:
             self.hit_flag = 0
 
-
+        # Third card dealt
         if self.hit_flag > 0 and game_state.initial_player_hand_time_flag > 3:
             game_state.screen.blit(game_state.card_display(card3, suite3), self.card_position_generator(2))
-            self.player_hand_value = game_state.face_value(card1, 1) + game_state.face_value(card2, 1) + game_state.face_value(card3, 1)
+            #self.player_hand_value = game_state.face_value(1, 1) + game_state.face_value(card2, 1) + game_state.face_value(card3, 1)
+            
+            if self.player_hand_value > 10 and self.player_card_arr[0] == 11:
+                self.player_card_arr[0] = 1
+
+            if self.player_hand_value > 10 and self.player_card_arr[2] == 11:
+                self.player_card_arr[2] = 1
+            
+            self.player_hand_value = self.player_card_arr[0] + self.player_card_arr[1] + self.player_card_arr[2]
         
         if self.hit_flag > 1 and game_state.initial_player_hand_time_flag > 3:
             game_state.screen.blit(game_state.card_display(card4, suite4), self.card_position_generator(3))
-            self.player_hand_value = game_state.face_value(card1, 1) + game_state.face_value(card2, 1) + game_state.face_value(card3, 1) + game_state.face_value(card4, 1)
+
+            if self.player_hand_value > 10 and self.player_card_arr[3] == 11:
+                self.player_card_arr[3] = 1
+
+            self.player_hand_value = self.player_card_arr[0] + self.player_card_arr[1] + self.player_card_arr[2] + self.player_card_arr[3]
+            #self.player_hand_value = game_state.face_value(1, 1) + game_state.face_value(card2, 1) + game_state.face_value(card3, 1) + game_state.face_value(card4, 1)
 
         if self.hit_flag > 2 and game_state.initial_player_hand_time_flag > 3:
 
             game_state.screen.blit(game_state.card_display(card5, suite5), self.card_position_generator(4))
-            self.player_hand_value = game_state.face_value(card1, 1) + game_state.face_value(card2, 1) + game_state.face_value(card3, 1) + game_state.face_value(card4, 1) + game_state.face_value(card5, 1)
+            if self.player_hand_value > 10 and self.player_card_arr[4] == 11:
+                self.player_card_arr[4] = 1
+
+            self.player_hand_value = self.player_card_arr[0] + self.player_card_arr[1] + self.player_card_arr[2] + self.player_card_arr[3] + self.player_card_arr[4]
+            #self.player_hand_value = game_state.face_value(1, 1) + game_state.face_value(card2, 1) + game_state.face_value(card3, 1) + game_state.face_value(card4, 1) + game_state.face_value(card5, 1)
         game.display.flip()
 
 
 # Class to handle the rules of the dealer
 class Dealer:
     
+    dealer_card_arr = []
     def dealer_card_generator(self):
 
         global d_card1, d_suite1, d_card2, d_suite2, d_card3, d_suite3, d_card4, d_suite4
@@ -1048,6 +1097,8 @@ class Dealer:
 
         d_card8 = random.randint(1,13)
         d_suite8 = random.randint(1,4)
+
+        self.dealer_card_arr = [d_card1, d_card2, d_card3, d_card4,d_card5,d_card6,d_card7,d_card8]
     
     initial_dealer_card_x = 630
     initial_dealer_card_y = 200
@@ -1070,7 +1121,8 @@ class Dealer:
         if player.deal_flag != 0 and player.stand_flag == 0 and game_state.initial_player_hand_time_flag > 1 and game_state.initial_player_hand_time_flag < 3:
 
             game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
-            self.dealer_hand_value = game_state.face_value(d_card1, 2)
+            self.dealer_hand_value = self.dealer_card_arr[0]
+            #self.dealer_hand_value = game_state.face_value(d_card1, 2)
             game.display.flip()
         
         if player.deal_flag != 0 and player.stand_flag == 0 and game_state.initial_player_hand_time_flag > 3:
