@@ -544,10 +544,7 @@ class GamePlay:
             
             if self.win_check(player.player_hand_value, dealer.dealer_hand_value) == 0:
                 game_state.win_value = 0
-                dealer.round_over_flag = 1
-            
-        #print(self.win_check(player.player_hand_value, dealer.dealer_hand_value), player.player_hand_value, dealer.dealer_hand_value, player.player_second_card_flag)
-            
+                dealer.round_over_flag = 1     
     
     def new_round(self):
 
@@ -562,8 +559,6 @@ class GamePlay:
             dealer.back_card_flag = 0
             game_state.inital_player_hand_time = time.time()
             game_state.initial_time = 999999999999999999
-            #print(card1, player.hit_flag, player.stand_flag)
-            #print("dealer flag is:", player.deal_flag)
     
     # Test button 
     flag = 0
@@ -1089,8 +1084,6 @@ class Player:
             game_state.screen.blit(game_state.card_display(card1, suite1), self.card_position_generator(0))
             
             self.player_hand_value = self.player_card_arr[0]
-            #self.player_hand_value = game_state.face_value(card1, 1)
-            #game_state.screen.blit(game_state.card_display(card2, suite2), self.card_position_generator(1))
 
         # Second card dealt
         if self.deal_flag != 0 and game_state.initial_player_hand_time_flag > 2 and game_state.flag == 0:
@@ -1120,9 +1113,6 @@ class Player:
             game_state.screen.blit(game_state.card_display(card1, suite1), self.card_position_generator(0))
             game_state.screen.blit(game_state.card_display(card2, suite2), self.card_position_generator(1))
             game_state.screen.blit(game_state.card_display(card3, suite3), self.card_position_generator(2))
-            #game_state.screen.blit(game_state.card_display(d_card1, d_suite1), dealer.dealer_position_generator(0))
-            #game_state.screen.blit(game_state.back, dealer.dealer_position_generator(1))
-            #self.player_hand_value = game_state.face_value(1, 1) + game_state.face_value(card2, 1) + game_state.face_value(card3, 1)
             
             if self.player_hand_value > 10 and self.player_card_arr[2] == 11:
                 self.player_card_arr[2] = 1
@@ -1237,10 +1227,6 @@ class Dealer:
             self.back_card_flag += 1
             game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
             game_state.screen.blit(game_state.back, self.dealer_position_generator(1))
-
-
-            #game_state.screen.blit(game_state.card_display(card1, suite1), player.card_position_generator(0))
-            #game_state.screen.blit(game_state.card_display(card2, suite2), player.card_position_generator(1))
     
             game.display.flip()
         
