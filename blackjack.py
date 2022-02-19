@@ -546,7 +546,7 @@ class GamePlay:
                 game_state.win_value = 0
                 dealer.round_over_flag = 1
             
-        print(self.win_check(player.player_hand_value, dealer.dealer_hand_value), player.player_hand_value, dealer.dealer_hand_value, player.player_second_card_flag)
+        #print(self.win_check(player.player_hand_value, dealer.dealer_hand_value), player.player_hand_value, dealer.dealer_hand_value, player.player_second_card_flag)
             
     
     def new_round(self):
@@ -556,11 +556,16 @@ class GamePlay:
             player.deal_btn_flag = 10
             player.hit_flag = 0
             player.stand_flag = 0
-            # player.player_hand_value = 0
-            # dealer.dealer_hand_value = 0
-            print(card1, player.hit_flag, player.stand_flag)
-            print("dealer flag is:", player.deal_flag)
+            dealer.second_card_flag = 0
+            dealer.third_card_flag = 0
+            dealer.fourth_card_flag = 0
+            dealer.back_card_flag = 0
+            game_state.inital_player_hand_time = time.time()
+            game_state.initial_time = 999999999999999999
+            #print(card1, player.hit_flag, player.stand_flag)
+            #print("dealer flag is:", player.deal_flag)
     
+    # Test button 
     flag = 0
     card_1 = 0
     card_2 = 0
@@ -575,7 +580,7 @@ class GamePlay:
                         self.card_1 = random.randint(1, 2)
                         self.card_2 = random.randint(1, 2)
                         self.flag = 1
-
+            
                         print("pressed")
         
         if self.flag == 1:
@@ -622,9 +627,10 @@ class GamePlay:
             # player.dealt_cards()
             # dealer.dealer_cards()
             game_state.round_result()
-            #game_state.new_round()
+            game_state.new_round()
             #game_state.test_btn()
             player.deal_display()
+            print(game_state.initial_player_hand_time_flag)
             for event in game.event.get():
 
                 if event.type == game.QUIT: 
@@ -633,14 +639,18 @@ class GamePlay:
                     sys.exit()
 
 
-
 # Class to handle the rules of the player
 class Player:
+
+    # Flags to signify when certain buttons have been pressed  
     deal_flag = 0
     hit_flag = 0
     stand_flag = 0 
     
+    # Array to store the randomly generated cards of the player
     player_card_arr = []
+
+    # Function to generate random cards for the player
     def card_generator(self):
         global card1, suite1, card2, suite2 , card3, suite3, card4, suite4
         global card5, suite5, card6, suite6 , card7, suite7, card8, suite8
@@ -675,6 +685,8 @@ class Player:
     # Action buttons
     game.font.init()
     font = game.font.SysFont("calibri", 20)
+
+    # Actions of pressing the split button 
     split_x_pos = 350
     split_y_pos = 725
 
@@ -693,6 +705,7 @@ class Player:
                 game.draw.rect(game_state.screen, (btn_colour),[self.split_x_pos, self.split_y_pos, self.split_x_len, self.split_y_len])
                 game_state.screen.blit(split, (self.split_x_pos + (0.27 * self.split_x_len), self.split_y_pos + (0.3 * self.split_y_len)))
     
+    # Actions of pressing the hit button
     hit_x_pos = split_x_pos + 200
     hit_y_pos = split_y_pos
 
@@ -707,7 +720,9 @@ class Player:
         game.draw.rect(game_state.screen, (game_state.table_red),[self.hit_x_pos, self.hit_y_pos, self.hit_x_len, self.hit_y_len])
         game_state.screen.blit(hit, (self.hit_x_pos + (0.35 * self.hit_x_len), self.hit_y_pos + (0.3 * self.hit_y_len)))
         self.hit_flag += 1
+        print("hit flag is now: " + str(self.hit_flag))
 
+    # Actions of pressing the stand button
     stand_x_pos = hit_x_pos + 200
     stand_y_pos = split_y_pos
 
@@ -730,6 +745,7 @@ class Player:
     deal_x_len = 100
     deal_y_len = 30
 
+    # Actions of pressing the deal button
     def deal_action(self):
     
       
@@ -742,11 +758,17 @@ class Player:
         game_state.bet_value = game_state.count_value
         game_state.remainder = game_state.initial_balance - game_state.count_value
         game_state.initial_balance = game_state.initial_balance - game_state.count_value
-
+        player.player_hand_value = 0
+        dealer.dealer_hand_value = 0
+        game_state.initial_player_hand_time_flag = 0
+        #self.hit_flag = 0
+        #print("Hit flag is: " + str(self.hit_flag))
+        print("The time flag is:" + str(game_state.initial_player_hand_time_flag))
 
         if game_state.initial_balance < 0:
             game_state.initial_balance = 0
         
+        game_state.count_value = game_state.remainder
         
         game_state.inital_player_hand_time = time.time()
         game_state.initial_time = 999999999999999999
@@ -966,9 +988,9 @@ class Player:
                 for event in game.event.get():
                             if event.type == game.MOUSEBUTTONDOWN:
                                 self.add_action()
-        
 
-        # Deal button
+                    
+        # Deal button                       
 
         deal_x_pos = 1240
         deal_y_pos = 660
@@ -979,7 +1001,7 @@ class Player:
         game.draw.rect(game_state.screen, (game_state.boarder), [deal_x_pos - 1, deal_y_pos - 1, deal_x_len + 2, deal_y_len + 2])
         game.draw.rect(game_state.screen, (game_state.table_red),[deal_x_pos, deal_y_pos, deal_x_len, deal_y_len])
 
-        game_state.screen.blit(deal, (deal_x_pos + 10, deal_y_pos + 6))
+        game_state.screen.blit(deal, (deal_x_pos + 27, deal_y_pos + 6))
 
         if (time.time() - self.deal_btn_time_init) > 1:
             self.deal_btn_flag += 1
@@ -1200,6 +1222,7 @@ class Dealer:
 
         # Time checking was implemented to control the animation of the cards, 1 second was allocated for each card showing up on the screen
         
+        #First dealer card
         if player.deal_flag != 0 and player.stand_flag == 0 and game_state.initial_player_hand_time_flag > 1 and game_state.initial_player_hand_time_flag < 3:
 
             game_state.screen.blit(game_state.card_display(d_card1, d_suite1), self.dealer_position_generator(0))
