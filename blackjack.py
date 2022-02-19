@@ -499,8 +499,7 @@ class GamePlay:
         # Checking for losses, a return of 0 means the player lost, 1 means the player won, 2 means the player got black jack and 3 means the dealer got black jack
         if player > 21:
             return 0
-        if player == dealer:
-            return 0
+
         
         if player < dealer:
             if player <= 21 and dealer <= 21:
@@ -512,14 +511,18 @@ class GamePlay:
         
 
         if player <= 21 and dealer <= 21 and player > dealer: # and Player.player_second_card_flag != 0 and Player.player_hand_value != 21:
-            return 1 
+            return 1
         
         if player <= 21 and dealer > 21:
             return 1 
 
         if Dealer.dealer_hand_value == 21:
             return 3
-    
+
+        if player <= 21 and dealer <= 21:
+            if player == dealer:
+                return 4
+
     def round_result(self):
 
         # Conditions to signify that the round is over, either player or dealer gets blackjack or if the dealer exceeds 16
@@ -530,9 +533,7 @@ class GamePlay:
                 dealer.round_over_flag = 1
 
         if dealer.round_over_flag != 0:
-            #print(player.player_hand_value, dealer.dealer_hand_value)
-
-            #print(self.win_check(player.player_hand_value, dealer.dealer_hand_value))
+    
             if self.win_check(player.player_hand_value, dealer.dealer_hand_value) == 1: 
                 game_state.initial_balance = int(game_state.remainder + 2 * game_state.bet_value)
                 game_state.win_value = int(2 * game_state.bet_value)
@@ -540,6 +541,10 @@ class GamePlay:
             if self.win_check(player.player_hand_value, dealer.dealer_hand_value) == 2: 
                 game_state.initial_balance = int(game_state.remainder + 2.5 * game_state.bet_value)
                 game_state.win_value = int(2.5 * game_state.bet_value)
+            
+            if self.win_check(player.player_hand_value, dealer.dealer_hand_value) == 4: 
+                game_state.initial_balance = int(game_state.remainder + game_state.bet_value)
+                game_state.win_value = 0
             
             
             if self.win_check(player.player_hand_value, dealer.dealer_hand_value) == 0:
@@ -651,11 +656,9 @@ class Player:
         global card5, suite5, card6, suite6 , card7, suite7, card8, suite8
 
         card1 = random.randint(1, 13)
-        #card1 = 1
         suite1 = random.randint(1,4)
 
         card2 = random.randint(1, 13)
-        #card2 = 10
         suite2 = random.randint(1,4)
 
         card3 = random.randint(1, 13)
@@ -1163,11 +1166,9 @@ class Dealer:
         global d_card5, d_suite5, d_card6, d_suite6, d_card7, d_suite7, d_card8, d_suite8
 
         d_card1 = random.randint(1,13)
-        #d_card1 = 1
         d_suite1 = random.randint(1,4)
 
         d_card2 = random.randint(1,13)
-        #d_card2 = 7
         d_suite2 = random.randint(1,4)
 
         d_card3 = random.randint(1,13)
