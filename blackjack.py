@@ -562,8 +562,32 @@ class GamePlay:
             dealer.third_card_flag = 0
             dealer.fourth_card_flag = 0
             dealer.back_card_flag = 0
+            game_state.time_flag = 0
             game_state.inital_player_hand_time = time.time()
             game_state.initial_time = 999999999999999999
+    
+
+    def restart(self):
+        deal = player.font.render("DEAL", True, game_state.white)
+        btn_colour = (70, 10, 10)
+        player.deal_flag = 0
+
+        game.draw.rect(self.screen, (btn_colour),[player.deal_x_pos, player.deal_y_pos, player.deal_x_len, player.deal_y_len])
+        self.screen.blit(deal, (player.deal_x_pos + 10, player.deal_y_pos + 6))
+        self.count_value = 0
+        self.bet_value = 0
+        self.initial_balance = 1000
+        self.initial_player_hand_time_flag = 0
+        self.initial_time = 999999999999999999
+        self.new_round()
+
+        player.player_hand_value = 0
+        player.deal_btn_flag = 0
+        player.card_generator()
+
+        dealer.dealer_hand_value = 0
+        dealer.back_card_flag = 0
+        dealer.dealer_card_generator()
     
     # Test button 
     flag = 0
@@ -593,7 +617,7 @@ class GamePlay:
             game_state.screen.blit(game_state.card_display(self.card_2, 2), dealer.dealer_position_generator(1))
             game_state.screen.blit(game_state.card_display(self.card_1, 1), player.card_position_generator(0))
             game_state.screen.blit(game_state.card_display(self.card_2, 2), player.card_position_generator(1))
-            print(self.flag)
+            #print(self.flag)
             game.display.flip()
             
 
@@ -630,7 +654,7 @@ class GamePlay:
             game_state.new_round()
             #game_state.test_btn()
             player.deal_display()
-            print(game_state.initial_player_hand_time_flag)
+            #print(game_state.initial_player_hand_time_flag)
             for event in game.event.get():
 
                 if event.type == game.QUIT: 
@@ -718,7 +742,7 @@ class Player:
         game.draw.rect(game_state.screen, (game_state.table_red),[self.hit_x_pos, self.hit_y_pos, self.hit_x_len, self.hit_y_len])
         game_state.screen.blit(hit, (self.hit_x_pos + (0.35 * self.hit_x_len), self.hit_y_pos + (0.3 * self.hit_y_len)))
         self.hit_flag += 1
-        print("hit flag is now: " + str(self.hit_flag))
+        #print("hit flag is now: " + str(self.hit_flag))
 
     # Actions of pressing the stand button
     stand_x_pos = hit_x_pos + 200
@@ -761,7 +785,7 @@ class Player:
         game_state.initial_player_hand_time_flag = 0
         #self.hit_flag = 0
         #print("Hit flag is: " + str(self.hit_flag))
-        print("The time flag is:" + str(game_state.initial_player_hand_time_flag))
+        #print("The time flag is:" + str(game_state.initial_player_hand_time_flag))
 
         if game_state.initial_balance < 0:
             game_state.initial_balance = 0
@@ -770,7 +794,7 @@ class Player:
         
         game_state.inital_player_hand_time = time.time()
         game_state.initial_time = 999999999999999999
-        print(self.deal_flag)
+        #print(self.deal_flag).
 
 
     sub_x_pos = GamePlay.bet_display_x_pos 
@@ -845,6 +869,10 @@ class Player:
         if game.mouse.get_pos()[0] > split_x_pos and game.mouse.get_pos()[0] < split_x_pos + split_x_len:
             if game.mouse.get_pos()[1] > split_y_pos and game.mouse.get_pos()[1] < split_y_pos + split_y_len:
                 self.split_action()
+
+        if keys[game.K_r]:
+            game_state.new_round()
+            game_state.restart()
 
         # Hit button 
         hit_x_pos = split_x_pos + 200
